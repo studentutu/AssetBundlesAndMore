@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8668589143725506357
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8668589143725506352}
+  - component: {fileID: 8668589143725506359}
+  - component: {fileID: 8668589143725506358}
+  - component: {fileID: 8668589143725506353}
+  - component: {fileID: 8668589143725506354}
+  m_Layer: 0
+  m_Name: Entry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &8668589143725506352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668589143725506357}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8668589143725506359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668589143725506357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c54c28693f33ee4db36ad03a7137d02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneService:
+    m_video: {fileID: 8668589143725506358}
+    m_camera: {fileID: 8668589143725506354}
+    scenes:
+    - Entry
+    - App
+  jsonConverter:
+    saveTo: app.custom
+    saveToAsset: {fileID: 4900000, guid: 0d44184bb166f4247bf4fd94861cc6b7, type: 3}
+  webLoader:
+    mainUrl: https://drive.google.com/uc?export=download&id=1aVXbPuWvGZeIksSawfiRTebx50dPSgHL
+--- !u!328 &8668589143725506358
+VideoPlayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668589143725506357}
+  m_Enabled: 0
+  m_VideoClip: {fileID: 32900000, guid: 37038b262ce7c0e4e83f0e62ffcba1e1, type: 3}
+  m_TargetCameraAlpha: 0
+  m_TargetCamera3DLayout: 0
+  m_TargetCamera: {fileID: 8668589143725506354}
+  m_TargetTexture: {fileID: 0}
+  m_TimeReference: 0
+  m_TargetMaterialRenderer: {fileID: 0}
+  m_TargetMaterialProperty: _MainTex
+  m_RenderMode: 1
+  m_AspectRatio: 5
+  m_DataSource: 0
+  m_PlaybackSpeed: 1
+  m_AudioOutputMode: 0
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: 
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 1
+  m_Looping: 1
+  m_WaitForFirstFrame: 1
+  m_FrameReadyEventEnabled: 0
+--- !u!114 &8668589143725506353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668589143725506357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44651c953c0590b4d8a0653dfeb815cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WriteImageToBase: 0
+  convertTo: {fileID: 2800000, guid: 5979675b7f13f8a408f0031ea4fb57fe, type: 3}
+  saveToBase64: {fileID: 4900000, guid: 0d44184bb166f4247bf4fd94861cc6b7, type: 3}
+  TestRawImage: 0
+  imageTOPassIn: {fileID: 0}
+  WriteUrls: 0
+  modelUrlLists:
+    Urls:
+    - Url: https://drive.google.com/uc?export=download&id=13XUhCO_BR5RA9j7-7zI_8BOEGeyBQvpZ
+      Name: Pikachu
+    - Url: https://drive.google.com/uc?export=download&id=1FL4-bSTwnGbLXeXgMjEInWz-5T0hPbD2
+      Name: Jigglypuff
+    - Url: https://drive.google.com/uc?export=download&id=1iH8dSW75kwQUpmFaCsavzfknLaTfn486
+      Name: Sheep
+    - Url: https://drive.google.com/uc?export=download&id=1BPzdcZcGv-_DToLeqYxuuMvBjS1uFym6
+      Name: Mario
+    - Url: https://drive.google.com/uc?export=download&id=1TZ4LZ30h4kYhskWlL0NbX8PdfwbaiuSk
+      Name: MegaMan
+  saveTo: {fileID: 4900000, guid: 7ce4174198027b440a582c6cb2f45cb2, type: 3}
+--- !u!20 &8668589143725506354
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8668589143725506357}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 10
+  field of view: 60
+  orthographic: 1
+  orthographic size: 5
+  m_Depth: 100
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: 1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 0
+  m_HDR: 0
+  m_AllowMSAA: 0
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 0
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
