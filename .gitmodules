@@ -1,0 +1,4 @@
+[submodule "Assets/ArFrameworkAgnostic"]
+	path = Assets/ArFrameworkAgnostic
+	url = https://github.com/studentutu/ArFrameworkAgnostic
+	branch = master
