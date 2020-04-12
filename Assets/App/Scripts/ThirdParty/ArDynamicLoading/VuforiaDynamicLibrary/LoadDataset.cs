@@ -17,8 +17,10 @@ namespace Framework.IGroundPlane
 #endif
     }
 
-    public class LoadDataset
+    public class LoadDataset : MonoBehaviour
     {
+        [SerializeField] private DislocatedImiteraImageTarget prefab = null;
+
 #if F_C_VUFORIA
         //This function will de-activate all current datasets and activate the designated dataset.
         //It is assumed the dataset being activated has already been loaded (either through code
@@ -107,11 +109,18 @@ namespace Framework.IGroundPlane
             float width = entry.widthInMeters == null ? 0.15f : entry.widthInMeters.Value;
             runtimeImageSource.SetImage(entry.texture, width, entry.id);
 
-            //  use the source to create a new trackable
             var trackableBehaviour = setToUse.CreateTrackable(runtimeImageSource, entry.id);
+            //  use the source to create a new trackable
+            var prev = prefab.enabled;
+            prefab.enabled = false;
+            var prefabInstance = GameObject.Instantiate(prefab, trackableBehaviour.transform, true);
+            prefabInstance.transform.localScale = Vector3.one;
+            prefab.enabled = prev;
 
             // add the DefaultTrackableEventHandler to the newly created game object
             trackableBehaviour.gameObject.AddComponent<DefaultTrackableEventHandler>();
+
+            DislocatedImiteraImageTarget.AddNewImageTarget(entry, prefabInstance);
             return true;
         }
 #endif

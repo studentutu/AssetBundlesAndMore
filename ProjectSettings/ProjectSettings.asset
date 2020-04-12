@@ -590,7 +590,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
-    1: 
+    1: F_C_VUFORIA
     7: F_C_VUFORIA;F_C_AR_FOUNDATION
   platformArchitecture: {}
   scriptingBackend:
