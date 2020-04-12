@@ -590,8 +590,8 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
-    1: F_C_AR_FOUNDATION
-    7: F_C_AR_FOUNDATION
+    1: 
+    7: F_C_VUFORIA;F_C_AR_FOUNDATION
   platformArchitecture: {}
   scriptingBackend:
     Android: 0

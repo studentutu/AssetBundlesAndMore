@@ -19,8 +19,10 @@ namespace Framework.IGroundPlane
         /// <summary>
         /// Someone should add images
         /// </summary>
+#pragma warning disable
         public static event Action<List<DynamicImageLibraryEntry>> OnRequestImageAdd;
         [SerializeField] private Transform trackedImageManager = null;
+#pragma warning restore
 
 #if F_C_AR_FOUNDATION
         private ARTrackedImageManager mARTrackedImageManager = null;
