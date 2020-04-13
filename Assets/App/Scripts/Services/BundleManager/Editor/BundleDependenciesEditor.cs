@@ -5,15 +5,16 @@ using UnityEditor;
 using System.Reflection;
 using System.Linq;
 using UnityEditorInternal;
+using Services.Bundles.Services.Bundles.Editor;
 
 namespace Services.Bundles
 {
-
     [CustomEditor(typeof(BundleDependencies), true)]
     public class BundleDependenciesEditor : CustomExtendedEditor
     {
         BundleDependencies _bundleDep;
-        SerializedProperty _bundleDependinciesSerialized;
+        IGetNames asIGetNames;
+        SerializedProperty _bundleDependenciesSerialized;
         ReorderableList _listOfDependencies;
         public bool showProjectModule = false;
         public bool showOwnMappingModule = false;
@@ -25,6 +26,7 @@ namespace Services.Bundles
         public void OnEnable()
         {
             _bundleDep = target as BundleDependencies;
+            asIGetNames = _bundleDep;
             var allProps = new List<string>();
             _dictionaryProperties = null;
             Dictionary<string, SerializedProperty> allProperties = new Dictionary<string, SerializedProperty>();
@@ -43,14 +45,14 @@ namespace Services.Bundles
                 {
                     allProperties.Add(item, something);
                 }
-                if (something != null && item.Contains("bundleDependinciesSerialized"))
+                if (something != null && item.Contains(asIGetNames.GetBundleDepPropName()))
                 {
-                    _bundleDependinciesSerialized = something;
+                    _bundleDependenciesSerialized = something;
                 }
 
             }
             _dictionaryProperties = allProperties;
-            _listOfDependencies = new ReorderableList(serializedObject, _bundleDependinciesSerialized.FindPropertyRelative("dictionaryitem"), true, true, true, true);
+            _listOfDependencies = new ReorderableList(serializedObject, _bundleDependenciesSerialized.FindPropertyRelative("dictionaryitem"), true, true, true, true);
             _listOfDependencies.drawElementCallback = DrawProductsElement;
             _listOfDependencies.drawHeaderCallback = DrawProductsHeader;
             _listOfDependencies.elementHeightCallback = CalculateHeight;
@@ -65,7 +67,7 @@ namespace Services.Bundles
         }
         private void DrawProductsElement(Rect rect, int i, bool isActive, bool isFocused)
         {
-            var element = _bundleDependinciesSerialized.FindPropertyRelative("dictionaryitem").GetArrayElementAtIndex(i);
+            var element = _bundleDependenciesSerialized.FindPropertyRelative("dictionaryitem").GetArrayElementAtIndex(i);
             rect.y += 2;
             EditorGUI.LabelField(new Rect(rect.x, rect.y, 50, 120), (i + 1) + ". Key");
             EditorGUI.PropertyField(new Rect(rect.x + 51, rect.y, 180, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("key"), GUIContent.none);
@@ -126,13 +128,13 @@ namespace Services.Bundles
         {
             foreach (var item in _dictionaryProperties.Keys)
             {
-                switch (item)
+                if (item.Equals(asIGetNames.GetBundleDepPropName()))
                 {
-                    case "bundleDependinciesSerialized":
-                        break;
-                    default:
-                        DrawDefaultProps(_dictionaryProperties[item]);
-                        break;
+                    continue;
+                }
+                else
+                {
+                    DrawDefaultProps(_dictionaryProperties[item]);
                 }
             }
         }

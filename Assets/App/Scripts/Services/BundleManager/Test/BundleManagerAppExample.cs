@@ -7,15 +7,20 @@ using Services.Bundles;
 using System.Threading.Tasks;
 
 // [CreateAssetMenu(fileName = "Container", menuName = "Bundles/Example", order = 0)]
-public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
+public class BundleManagerAppExample : BundleService<BundleManagerAppExample>
 {
 
     #region Your Custom Implementation of Getting real Url for a given bundlename
+    protected override Task GetUrlAsTask(string bundleName, UrlAsStringReference urlToSet, object options)
+    {
+        return GetUrl(bundleName, urlToSet, options);
+    }
+
     /// <summary>
     /// Works without any of the Firebase plugins (Pure Web requests) 
     /// Customized for every one bundle name in separate
     /// </summary>
-    public override async Task GetUrlCustom(string bundleName, UrlAsStringReference urlToSet, System.Object options)
+    private async Task GetUrl(string bundleName, UrlAsStringReference urlToSet, System.Object options)
     {
         var myOptions = options as TestBundleService.BundleOptions;
         string language = myOptions.LoadLanguage;
@@ -24,12 +29,10 @@ public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
         //     language = BundlesManager.LANGUAGE_FROM_BUNDLE;
         // }
 
-        string someUrl = null;
-
         if (myOptions.LoadBigdataObject)
         {
             // append .json at the end for Rest API Firebase (Get request,only read)
-            string keyNew = "Languages/" + platformToUse + ".json";
+            string keyNew = platformToUse + ".json";
 
             Log(" Key To Get Link From : " + keyNew);
             if (Application.internetReachability == NetworkReachability.NotReachable)
@@ -45,7 +48,7 @@ public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
 
                 if (!Errors)
                 {
-                    someUrl = (string)www.downloadHandler.text;
+                    string someUrl = (string)www.downloadHandler.text;
                     Log("New Url : " + someUrl);
                     urlToSet.url = someUrl.Substring(1, someUrl.Length - 2);
                 }
@@ -54,7 +57,6 @@ public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
                     Log("Error while Downloading : " + www.error);
                     Log(www.responseCode);
                 }
-
             }
         }
         else
@@ -82,7 +84,7 @@ public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
 
                 if (!Errors)
                 {
-                    someUrl = (string)www.downloadHandler.text;
+                    string someUrl = (string)www.downloadHandler.text;
                     Log("New Url : " + someUrl);
                     urlToSet.url = someUrl.Substring(1, someUrl.Length - 2);
                 }
@@ -91,7 +93,6 @@ public class BundleManagerAppExample : BundleScriptable<BundleManagerAppExample>
                     Log("Error while Downloading : " + www.error);
                     Log(www.responseCode);
                 }
-
             }
         }
     }

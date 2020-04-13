@@ -1,4 +1,5 @@
 ﻿using Scripts.Services;
+using Services.Bundles;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace Scripts
             private SceneManagementService sceneService = null;
             private IConverter jsonConverter = null;
             private URLLoader webLoader = null;
+            private BundleService bundleService = null;
 
             public SceneManagementService SceneService
             {
@@ -47,6 +49,18 @@ namespace Scripts
                 }
             }
 
+            public BundleService BundleService
+            {
+                get
+                {
+                    if (bundleService == null)
+                    {
+                        Entry.Instance.Init();
+                    }
+                    return bundleService;
+                }
+            }
+
             private ServicesHolder() { }
             public ServicesHolder(IReadOnlyList<IServices> services)
             {
@@ -67,6 +81,11 @@ namespace Scripts
                     if (webLoader == null)
                     {
                         webLoader = services[i] as URLLoader;
+                    }
+
+                    if (bundleService == null)
+                    {
+                        bundleService = services[i] as BundleService;
                     }
                 }
             }

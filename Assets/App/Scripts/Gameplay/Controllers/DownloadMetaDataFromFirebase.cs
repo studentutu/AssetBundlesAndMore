@@ -20,9 +20,9 @@ namespace Scripts.Gameplay.Controllers
 #if UNITY_IOS
             platform = IosPlatform;
 #endif
-
+            var urlWithJsonExtension = Url + ".json";
             var master = await App.Services.WebLoader
-                                .LoadData<MasterSlaveUrl>(disposable, OnError, Url);
+                                .LoadData<MasterSlaveUrl>(disposable, OnError, urlWithJsonExtension);
 
             if (!IDisposableObject.IsValid(disposable))
             {

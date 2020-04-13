@@ -4,8 +4,17 @@ using UnityEngine;
 
 namespace Services.Bundles
 {
+    namespace Services.Bundles.Editor
+    {
+        public interface IGetNames
+        {
+            string GetBundleDepPropName();
+        }
+    }
+
     [CreateAssetMenu(fileName = "BundleDependencies", menuName = "AssetBundles/Bundle Dependencies", order = 2)]
     public class BundleDependencies : ScriptableObject
+    , Services.Bundles.Editor.IGetNames
     {
         ///<summary> 
         /// Needed only for storing Data from editor, to take all depencency <see cref="ToDictionary()"/>
@@ -22,6 +31,11 @@ namespace Services.Bundles
                 bundleDependencies.Add(item.key, item.value);
             }
             return bundleDependencies;
+        }
+
+        string Services.Bundles.Editor.IGetNames.GetBundleDepPropName()
+        {
+            return nameof(bundleDependenciesSerialized);
         }
 
         public HashSet<string> ToHelpHashSetForOwnMappingDeps()

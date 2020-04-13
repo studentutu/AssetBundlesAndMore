@@ -18,8 +18,8 @@ namespace Services.Bundles
         }
     }
 
-    public abstract class BundleScriptable<T> : BundleScriptable
-            where T : BundleScriptable
+    public abstract class BundleService<T> : BundleService
+            where T : BundleService
     {
         #region  Hidden Data
         [SerializeField] protected BundleDependencies currentDependencies;
@@ -37,7 +37,7 @@ namespace Services.Bundles
         [SerializeField] public Strategy strategyToUse = Strategy.ALWAYS_UPDATE;
 
         [Tooltip("Enable this option if you want to use your Custom Logic for Mapping Bundle Names. e.g. using the same bundle names are not supported when set to false")]
-        [SerializeField] private bool UseOwnMapipngForNames = false;
+        [SerializeField] private bool UseOwnMappingForNames = false;
 
         #endregion
 
@@ -50,7 +50,7 @@ namespace Services.Bundles
                 currentDependencies = isItNew;
             }
             dependencyDictionary = currentDependencies.ToDictionary();
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 noPrefixDeps = currentDependencies.ToHelpHashSetForOwnMappingDeps();
             }
@@ -82,7 +82,7 @@ namespace Services.Bundles
         /// </summary>
         public bool IsBundleLoadedToMemory(string bundleName, string prefix = null)
         {
-            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMappingForNames && !string.IsNullOrEmpty(prefix))
             {
                 // Provide prefix to bundlename when adding it to Dictionary!
                 return allLoadedToMemBundles.ContainsKey(bundleName.ToLower() + prefix);
@@ -108,7 +108,7 @@ namespace Services.Bundles
             {
                 string BundleInMem;
                 // may be returned from the Bundle
-                if (UseOwnMapipngForNames && !string.IsNullOrEmpty(BundlePrefix))
+                if (UseOwnMappingForNames && !string.IsNullOrEmpty(BundlePrefix))
                 {
                     // Provide prefix to bundlename when adding it to Dictionary!
                     BundleInMem = bundleName.ToLower() + BundlePrefix;
@@ -147,7 +147,7 @@ namespace Services.Bundles
             if (IsBundleLoadedToMemory(BundleInMem, BundlePrefix))
             {
                 // may be returned from the Bundle
-                if (UseOwnMapipngForNames && !string.IsNullOrEmpty(BundlePrefix))
+                if (UseOwnMappingForNames && !string.IsNullOrEmpty(BundlePrefix))
                 {
                     // Provide prefix to bundlename when adding it to Dictionary!
                     BundleInMem = nameOfRequestedBundle.ToLower() + BundlePrefix;
@@ -173,7 +173,7 @@ namespace Services.Bundles
             string BundleInMem = BundleName.ToLower();
 
             // Delete from Memory  in Any Case to prevent Unity Same Memory Error
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 // Search others!!
                 var ListOfKeys = new List<string>();
@@ -254,7 +254,7 @@ namespace Services.Bundles
             string strmAssetspath = null;
             string usePrefix = noPrefixDeps.Contains(bundleName) ? null : Prefix;
 
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 if (string.IsNullOrEmpty(usePrefix))
                 {
@@ -317,7 +317,7 @@ namespace Services.Bundles
 
         private bool IsDependencyContainsGivenBundle(string bundleMain, string prefix = null)
         {
-            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMappingForNames && !string.IsNullOrEmpty(prefix))
             {
                 return dependencyDictionary.ContainsKey(bundleMain + prefix);
             }
@@ -326,7 +326,7 @@ namespace Services.Bundles
 
         private List<string> ReceiveDependencies(string bundleMain, string prefix = null)
         {
-            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMappingForNames && !string.IsNullOrEmpty(prefix))
             {
                 return dependencyDictionary[bundleMain + prefix];
             }
@@ -354,7 +354,7 @@ namespace Services.Bundles
 
 
             string cachedNameFromCustoms = bundleName.ToLower();
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 cachedNameFromCustoms = BundleNameToCacheName(bundleName.ToLower(), options);
             }
@@ -476,7 +476,7 @@ namespace Services.Bundles
         protected string GetCachedNameOfBundle(string bundleName, object options)
         {
             string result = null;
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 result = BundleNameToCacheName(bundleName.ToLower(), options);
             }
@@ -587,7 +587,7 @@ namespace Services.Bundles
             string pathToBundle = "file:///" + Application.streamingAssetsPath + "/" + pathFromStreamingAssets;
 #if UNITY_ANDROID
             // pathToBundle = Application.streamingAssetsPath + "/" + pathFromStreamingAssets;
-            pathToBundle = System.IO.Path.Combine(Application.streamingAssetsPath, pathFromStreamingAssets);
+            pathToBundle = Path.Combine(Application.streamingAssetsPath, pathFromStreamingAssets);
 #endif
             Log(" Loading From Streaming Assets into cache: " + pathToBundle);
 
@@ -604,7 +604,7 @@ namespace Services.Bundles
                 AssetBundle bundle = ((UnityEngine.Networking.DownloadHandlerAssetBundle)request.downloadHandler).assetBundle;
                 // UnityEngine.Networking.DownloadHandlerAssetBundle.GetContent(request);
 
-                Log(" Loading From Streaming Assets into cache ? : " + ((bundle == null) ? "Failure" : "Succes"));
+                Log(" Loading From Streaming Assets into cache ? : " + ((bundle == null) ? "Failure" : "Success"));
                 // Remove from memory to allow Caching logic do it's job
                 if (bundle != null)
                 {
@@ -655,7 +655,7 @@ namespace Services.Bundles
             }
 
             // Delete from Memory  in Any Case to prevent Unity  Same Memory Error
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 // Search others!!
 #if UNITY_EDITOR
@@ -697,7 +697,7 @@ namespace Services.Bundles
 
             bool isItCached = IsBundleCached(bundleName, Prefix, options);
 
-            if (UseOwnMapipngForNames)
+            if (UseOwnMappingForNames)
             {
                 // Two identical bundle names with different content!
                 // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
@@ -890,7 +890,7 @@ namespace Services.Bundles
                         string usePrefix = noPrefixDeps.Contains(item) ? null : Prefix;
                         isItCached = IsBundleCached(bundleName, usePrefix, options);
 
-                        if (UseOwnMapipngForNames)
+                        if (UseOwnMappingForNames)
                         {
                             // Two identical bundle names with different content!
                             // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
@@ -993,7 +993,7 @@ namespace Services.Bundles
                             string usePrefix = noPrefixDeps.Contains(item) ? null : Prefix;
                             isItCached = IsBundleCached(bundleName, usePrefix, options);
 
-                            if (UseOwnMapipngForNames)
+                            if (UseOwnMappingForNames)
                             {
                                 // Two identical bundle names with different content!
                                 // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
@@ -1115,7 +1115,7 @@ namespace Services.Bundles
                     {
                         var loadedBundle = ((UnityEngine.Networking.DownloadHandlerAssetBundle)www.downloadHandler).assetBundle;
                         // UnityEngine.Networking.DownloadHandlerAssetBundle.GetContent(www);
-                        if (UseOwnMapipngForNames)
+                        if (UseOwnMappingForNames)
                         {
                             // bundle names may be identical!
                             if (string.IsNullOrEmpty(Prefix))
@@ -1192,7 +1192,7 @@ namespace Services.Bundles
                     bool NoErrors = loadedBundle != null && string.IsNullOrEmpty(www.error);
                     if (NoErrors)
                     {
-                        if (UseOwnMapipngForNames)
+                        if (UseOwnMappingForNames)
                         {
                             // bundle names may be identical!
                             if (string.IsNullOrEmpty(Prefix))
@@ -1231,45 +1231,19 @@ namespace Services.Bundles
         }
         #endregion // Hidden Implementation (DO NOT TOUCH)
 
+        private async Task GetUrlCustom(string bundleName, UrlAsStringReference urlToSet, System.Object options)
+        {
+            var task = GetUrlAsTask(bundleName, urlToSet, options);
+            await task;
+        }
 
         #region Your Custom Implementation 
         /// <summary>
         /// Free to customize for every bundle name, DO NOT CALL base method!
         /// Remove "..." from each of the end Replace("\"", "");
         /// </summary>
-        public virtual async Task GetUrlCustom(string bundleName, UrlAsStringReference urlToSet, System.Object options)
-        {
-            // Example:  Standart Way
-            Debug.Log("-----------------------------------> Standart Example. ");
+        protected abstract Task GetUrlAsTask(string bundleName, UrlAsStringReference urlToSet, System.Object options);
 
-            // append .json at the end for Rest API Firebase (Get request,only read)
-            string keyNew = platformToUse + "/" + bundleName + ".json";
-
-            Log(" Key To Get Link From : " + keyNew);
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-            {
-                urlToSet.url = string.Empty;
-                return;
-            }
-
-            using (var www = UnityEngine.Networking.UnityWebRequest.Get(DatabaseURL + keyNew))
-            {
-                await www.SendWebRequest();
-                bool Errors = www.isNetworkError || www.isHttpError;
-                if (!Errors)
-                {
-                    string someUrl = www.downloadHandler.text;
-                    Log("New Url : " + someUrl);
-                    // remove "..." from each of the end Replace("\"", "");
-                    urlToSet.url = someUrl.Replace("\"", "");
-                }
-                else
-                {
-                    Log("Error in Downloading : " + www.error);
-                    Log(www.responseCode);
-                }
-            }
-        }
 
         protected abstract string BundleNameToCacheName(string bundleName, System.Object options);
 
@@ -1300,7 +1274,7 @@ namespace Services.Bundles
         }
     }
     // Template class
-    public class BundleScriptable : ScriptableObject
+    public class BundleService : ScriptableObject
     {
 
     }
