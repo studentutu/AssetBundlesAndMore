@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 3422244271
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: newmarkers
+      Dependencies: {}

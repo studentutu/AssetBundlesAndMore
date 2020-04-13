@@ -50,9 +50,9 @@ namespace Scripts.Services
             else
             {
                 disposableObject = new IDisposableObject();
-                var listOfItems = await App.WebLoader.LoadData(disposableObject,
+                var listOfItems = await App.Services.WebLoader.LoadData(disposableObject,
                 (msg) => { Debug.LogError(msg); },
-                App.WebLoader.MainUrl
+                App.Services.WebLoader.MainUrl
                 );
 
                 if (string.IsNullOrEmpty(listOfItems))
@@ -65,7 +65,7 @@ namespace Scripts.Services
                     return false;
                 }
 
-                var master = App.JsonConverter.FromJson<MasterSlaveUrl>(listOfItems);
+                var master = App.Services.JsonConverter.FromJson<MasterSlaveUrl>(listOfItems);
                 if (allManaged == null)
                 {
                     allManaged = new Dictionary<string, T>();
@@ -106,12 +106,12 @@ namespace Scripts.Services
                     switch (dataType)
                     {
                         case DataType.Custom:
-                            downloadHandler = await App.WebLoader.LoadAndGetDownloadHandler(disposableObject,
+                            downloadHandler = await App.Services.WebLoader.LoadAndGetDownloadHandler(disposableObject,
                                 (msg) => { Debug.LogError(msg); },
                                 master.Urls[i].Url);
                             break;
                         case DataType.AssetBundle:
-                            downloadHandler = await App.WebLoader.LoadAndGetAssetBundle(disposableObject,
+                            downloadHandler = await App.Services.WebLoader.LoadAndGetAssetBundle(disposableObject,
                                 (msg) => { Debug.LogError(msg); },
                                 master.Urls[i].Url);
                             break;

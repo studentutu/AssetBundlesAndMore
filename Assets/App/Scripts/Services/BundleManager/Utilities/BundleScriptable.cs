@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace KAUGamesLviv.Services.Bundles
+namespace Services.Bundles
 {
     [Serializable]
     public class UrlAsStringReference
@@ -17,7 +17,9 @@ namespace KAUGamesLviv.Services.Bundles
             return url;
         }
     }
-    public class BundleScriptable<T> : BehaviourScriptableObject where T : BehaviourScriptableObject
+
+    public abstract class BundleScriptable<T> : BundleScriptable
+            where T : BundleScriptable
     {
         #region  Hidden Data
         [SerializeField] protected BundleDependencies currentDependencies;
@@ -35,7 +37,7 @@ namespace KAUGamesLviv.Services.Bundles
         [SerializeField] public Strategy strategyToUse = Strategy.ALWAYS_UPDATE;
 
         [Tooltip("Enable this option if you want to use your Custom Logic for Mapping Bundle Names. e.g. using the same bundle names are not supported when set to false")]
-        [SerializeField] private bool UseOwnMapingOfNames = false;
+        [SerializeField] private bool UseOwnMapipngForNames = false;
 
         #endregion
 
@@ -48,7 +50,7 @@ namespace KAUGamesLviv.Services.Bundles
                 currentDependencies = isItNew;
             }
             dependencyDictionary = currentDependencies.ToDictionary();
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 noPrefixDeps = currentDependencies.ToHelpHashSetForOwnMappingDeps();
             }
@@ -58,7 +60,7 @@ namespace KAUGamesLviv.Services.Bundles
         #region  Public Utility methods
 
         /// <summary> Always initialize! </summary>
-        public void Constructed()
+        public void Init()
         {
 #if UNITY_ANDROID
             platformToUse = "Android";
@@ -80,11 +82,10 @@ namespace KAUGamesLviv.Services.Bundles
         /// </summary>
         public bool IsBundleLoadedToMemory(string bundleName, string prefix = null)
         {
-            if (UseOwnMapingOfNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
             {
                 // Provide prefix to bundlename when adding it to Dictionary!
                 return allLoadedToMemBundles.ContainsKey(bundleName.ToLower() + prefix);
-
             }
             return allLoadedToMemBundles.ContainsKey(bundleName.ToLower());
         }
@@ -107,7 +108,7 @@ namespace KAUGamesLviv.Services.Bundles
             {
                 string BundleInMem;
                 // may be returned from the Bundle
-                if (UseOwnMapingOfNames && !string.IsNullOrEmpty(BundlePrefix))
+                if (UseOwnMapipngForNames && !string.IsNullOrEmpty(BundlePrefix))
                 {
                     // Provide prefix to bundlename when adding it to Dictionary!
                     BundleInMem = bundleName.ToLower() + BundlePrefix;
@@ -146,7 +147,7 @@ namespace KAUGamesLviv.Services.Bundles
             if (IsBundleLoadedToMemory(BundleInMem, BundlePrefix))
             {
                 // may be returned from the Bundle
-                if (UseOwnMapingOfNames && !string.IsNullOrEmpty(BundlePrefix))
+                if (UseOwnMapipngForNames && !string.IsNullOrEmpty(BundlePrefix))
                 {
                     // Provide prefix to bundlename when adding it to Dictionary!
                     BundleInMem = nameOfRequestedBundle.ToLower() + BundlePrefix;
@@ -160,7 +161,7 @@ namespace KAUGamesLviv.Services.Bundles
                 if (temporal.isStreamedSceneAssetBundle)
                 {
                     string[] scenePaths = temporal.GetAllScenePaths();
-                    string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePaths[0]);
+                    string sceneName = Path.GetFileNameWithoutExtension(scenePaths[0]);
                     sceneLoadedFromBundle = sceneName;
                 }
             }
@@ -172,7 +173,7 @@ namespace KAUGamesLviv.Services.Bundles
             string BundleInMem = BundleName.ToLower();
 
             // Delete from Memory  in Any Case to prevent Unity Same Memory Error
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 // Search others!!
                 var ListOfKeys = new List<string>();
@@ -213,7 +214,7 @@ namespace KAUGamesLviv.Services.Bundles
                     allLoadedToMemBundles.Remove(item);
                 }
             }
-
+#if UNITY_EDITOR
             string LoadedBundles = "Bundles Now In Memory: ";
             ListOfKeys.Clear();
             foreach (var item in allLoadedToMemBundles.Keys)
@@ -221,6 +222,7 @@ namespace KAUGamesLviv.Services.Bundles
                 LoadedBundles += item + " ";
             }
             Log(LoadedBundles);
+#endif
         }
 
         public void UnloadAllMemorysAndValidate()
@@ -252,7 +254,7 @@ namespace KAUGamesLviv.Services.Bundles
             string strmAssetspath = null;
             string usePrefix = noPrefixDeps.Contains(bundleName) ? null : Prefix;
 
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 if (string.IsNullOrEmpty(usePrefix))
                 {
@@ -260,11 +262,7 @@ namespace KAUGamesLviv.Services.Bundles
                     {
                         if (item.bundleName.Equals(bundleName))
                         {
-#if UNITY_ANDROID
-                            strmAssetspath = item.bundlePathAndroid;
-#else
-                            strmAssetspath = item.bundlePathIOS;
-#endif
+                            strmAssetspath = item.Path;
                             break;
                         }
                     }
@@ -275,15 +273,10 @@ namespace KAUGamesLviv.Services.Bundles
                     {
                         if (item.bundleName.Equals(bundleName + usePrefix))
                         {
-#if UNITY_ANDROID
-                            strmAssetspath = item.bundlePathAndroid;
-#else
-                            strmAssetspath = item.bundlePathIOS;
-#endif
+                            strmAssetspath = item.Path;
                             break;
                         }
                     }
-
                 }
             }
             else
@@ -294,11 +287,7 @@ namespace KAUGamesLviv.Services.Bundles
                 {
                     if (item.bundleName.Equals(bundleName))
                     {
-#if UNITY_ANDROID
-                        strmAssetspath = item.bundlePathAndroid;
-#else
-                        strmAssetspath = item.bundlePathIOS;
-#endif
+                        strmAssetspath = item.Path;
                         break;
                     }
                 }
@@ -326,20 +315,18 @@ namespace KAUGamesLviv.Services.Bundles
             // #endif
         }
 
-
         private bool IsDependencyContainsGivenBundle(string bundleMain, string prefix = null)
         {
-            if (UseOwnMapingOfNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
             {
                 return dependencyDictionary.ContainsKey(bundleMain + prefix);
             }
             return dependencyDictionary.ContainsKey(bundleMain);
         }
 
-
         private List<string> ReceiveDependencies(string bundleMain, string prefix = null)
         {
-            if (UseOwnMapingOfNames && !string.IsNullOrEmpty(prefix))
+            if (UseOwnMapipngForNames && !string.IsNullOrEmpty(prefix))
             {
                 return dependencyDictionary[bundleMain + prefix];
             }
@@ -367,7 +354,7 @@ namespace KAUGamesLviv.Services.Bundles
 
 
             string cachedNameFromCustoms = bundleName.ToLower();
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 cachedNameFromCustoms = BundleNameToCacheName(bundleName.ToLower(), options);
             }
@@ -489,7 +476,7 @@ namespace KAUGamesLviv.Services.Bundles
         protected string GetCachedNameOfBundle(string bundleName, object options)
         {
             string result = null;
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 result = BundleNameToCacheName(bundleName.ToLower(), options);
             }
@@ -577,7 +564,10 @@ namespace KAUGamesLviv.Services.Bundles
             {
                 string checkIfNull = GetCachedNameOfBundle(bundleToSearch, options);
                 if (!string.IsNullOrEmpty(checkIfNull))
-                    Caching.GetCachedVersions(GetCachedNameOfBundle(bundleToSearch, options), allHashes);
+                {
+                    Caching.GetCachedVersions(
+                        GetCachedNameOfBundle(bundleToSearch, options), allHashes);
+                }
             }
 
             foreach (var item in allHashes)
@@ -662,11 +652,10 @@ namespace KAUGamesLviv.Services.Bundles
                     }
                     return;
                 }
-
             }
 
             // Delete from Memory  in Any Case to prevent Unity  Same Memory Error
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 // Search others!!
 #if UNITY_EDITOR
@@ -697,7 +686,6 @@ namespace KAUGamesLviv.Services.Bundles
                     allLoadedToMemBundles[bundleName.ToLower()].Unload(true);
                     allLoadedToMemBundles.Remove(bundleName.ToLower());
                 }
-
             }
 
             Resources.UnloadUnusedAssets(); // do you need it ???? It will clear the resources, but  will result in a Frame Hiccup
@@ -709,14 +697,15 @@ namespace KAUGamesLviv.Services.Bundles
 
             bool isItCached = IsBundleCached(bundleName, Prefix, options);
 
-            if (UseOwnMapingOfNames)
+            if (UseOwnMapipngForNames)
             {
                 // Two identical bundle names with different content!
                 // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
                 if (PlayerPrefs.HasKey(GetCachedNameOfBundle(bundleName, options)))
                 {
                     string usePrefix = noPrefixDeps.Contains(bundleName) ? null : Prefix;
-                    if (usePrefix != null && PlayerPrefs.GetString(GetCachedNameOfBundle(bundleName, options)) != Prefix)
+                    if (usePrefix != null && PlayerPrefs.GetString(
+                        GetCachedNameOfBundle(bundleName, options)) != Prefix)
                     {
                         Log(" Check with Collision on the same name with Player Prefs");
                         isItCached = false;
@@ -795,9 +784,9 @@ namespace KAUGamesLviv.Services.Bundles
                         LogWarning("Bundle is being used and cannot be Deleted from Cache!");
                         onError.Invoke("Bundle is being used and cannot be Deleted from Cache!");
                     }
-
                     return;
                 }
+
                 string StreamingAssetPath = IsInStreamingAssets(bundleName.ToLower(), Prefix);
                 if (StreamingAssetPath != null)
                 {
@@ -847,7 +836,6 @@ namespace KAUGamesLviv.Services.Bundles
                             LogWarning("Bundle is being used and cannot be Deleted from Cache!");
                             onError.Invoke("Bundle is being used and cannot be Deleted from Cache!");
                         }
-
                         return;
                     }
 
@@ -902,7 +890,7 @@ namespace KAUGamesLviv.Services.Bundles
                         string usePrefix = noPrefixDeps.Contains(item) ? null : Prefix;
                         isItCached = IsBundleCached(bundleName, usePrefix, options);
 
-                        if (UseOwnMapingOfNames)
+                        if (UseOwnMapipngForNames)
                         {
                             // Two identical bundle names with different content!
                             // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
@@ -924,8 +912,11 @@ namespace KAUGamesLviv.Services.Bundles
                         {
                             Log("dependency bundle :" + item + " needs to be loaded");
                             // Find the Url for a given Bundle Name
-                            await LoadAnybundleCoroutine(item, false, Strategy.NONE, null, onError, null, null, null, usePrefix); // load anew, in this situation does nothing!
-                                                                                                                                  // the main decision of downloading it all a new comes from Chosen Strategy (one for a whole process)!
+                            await LoadAnybundleCoroutine(item, false, Strategy.NONE,
+                                                        null, onError, null, null,
+                                                        null, usePrefix);
+                            // load anew, in this situation does nothing!
+
                         }
                         if (IsBundleLoadedToMemory(item))
                         {
@@ -1002,7 +993,7 @@ namespace KAUGamesLviv.Services.Bundles
                             string usePrefix = noPrefixDeps.Contains(item) ? null : Prefix;
                             isItCached = IsBundleCached(bundleName, usePrefix, options);
 
-                            if (UseOwnMapingOfNames)
+                            if (UseOwnMapipngForNames)
                             {
                                 // Two identical bundle names with different content!
                                 // Set Cached Bundle Name into PlayerPrefs and Check if value == Prefix!
@@ -1054,9 +1045,10 @@ namespace KAUGamesLviv.Services.Bundles
                 }
 
                 // start loading
-                await LoadBundle(true, bundleName, currentURL, onComplete, null, onLoadingMain, onError, customProgressFunction, Prefix, options);
+                await LoadBundle(true, bundleName, currentURL,
+                                onComplete, null, onLoadingMain,
+                                onError, customProgressFunction, Prefix, options);
             }
-
         }
 
 
@@ -1086,7 +1078,7 @@ namespace KAUGamesLviv.Services.Bundles
 
 
                 // This way it will always search cached values and if it fails to load from cache, will load from Server
-                // Checks with Cache with verion 0, if it exists, will load from cache, if fails or not exists, will load from Server
+                // Checks with Cache with version 0, if it exists, will load from cache, if fails or not exists, will load from Server
                 using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(currentURL.url, 0, 0))
                 // using (var www = WWW.LoadFromCacheOrDownload(currentURL, 0)) // deprecated
                 {
@@ -1105,7 +1097,7 @@ namespace KAUGamesLviv.Services.Bundles
                             Log(System.String.Format("Percentage: {0:P2}.", values));
                         }
 
-                        await System.Threading.Tasks.Task.Delay(100);
+                        await Task.Delay(100);
                     }
                     if (onLoading != null)
                         onLoading.Invoke(www.downloadProgress);
@@ -1115,7 +1107,7 @@ namespace KAUGamesLviv.Services.Bundles
                     while (!www.isDone && !www.isNetworkError && !www.isHttpError)
                     {
 
-                        await System.Threading.Tasks.Task.Delay(50);
+                        await Task.Delay(50);
                     }
                     // yield return new WaitForSeconds(0.25f); // For big and small data, decompression time
                     bool Errors = www.isNetworkError || www.isHttpError;
@@ -1123,7 +1115,7 @@ namespace KAUGamesLviv.Services.Bundles
                     {
                         var loadedBundle = ((UnityEngine.Networking.DownloadHandlerAssetBundle)www.downloadHandler).assetBundle;
                         // UnityEngine.Networking.DownloadHandlerAssetBundle.GetContent(www);
-                        if (UseOwnMapingOfNames)
+                        if (UseOwnMapipngForNames)
                         {
                             // bundle names may be identical!
                             if (string.IsNullOrEmpty(Prefix))
@@ -1192,7 +1184,7 @@ namespace KAUGamesLviv.Services.Bundles
                     while (!www.isDone && !www.isNetworkError && !www.isHttpError)
                     {
 
-                        await System.Threading.Tasks.Task.Delay(50);
+                        await Task.Delay(50);
                     }
                     // yield return new WaitForSeconds(0.25f); // needs a bit of time to process for downloadHandler
                     var loadedBundle = ((UnityEngine.Networking.DownloadHandlerAssetBundle)www.downloadHandler).assetBundle;
@@ -1200,7 +1192,7 @@ namespace KAUGamesLviv.Services.Bundles
                     bool NoErrors = loadedBundle != null && string.IsNullOrEmpty(www.error);
                     if (NoErrors)
                     {
-                        if (UseOwnMapingOfNames)
+                        if (UseOwnMapipngForNames)
                         {
                             // bundle names may be identical!
                             if (string.IsNullOrEmpty(Prefix))
@@ -1234,100 +1226,85 @@ namespace KAUGamesLviv.Services.Bundles
                         if (onComplete != null)
                             onComplete.Invoke(false);
                     }
-
                 }
             }
         }
-
-
         #endregion // Hidden Implementation (DO NOT TOUCH)
 
 
         #region Your Custom Implementation 
         /// <summary>
         /// Free to customize for every bundle name, DO NOT CALL base method!
+        /// Remove "..." from each of the end Replace("\"", "");
         /// </summary>
-        public virtual async System.Threading.Tasks.Task GetUrlCustom(string bundleName, UrlAsStringReference urlToSet, System.Object options)
+        public virtual async Task GetUrlCustom(string bundleName, UrlAsStringReference urlToSet, System.Object options)
         {
             // Example:  Standart Way
             Debug.Log("-----------------------------------> Standart Example. ");
 
-            string language = "en";
-            if (options != null)
-            {
-                language = ((BundleOptions)options).LoadLanguage;
-            }
-            string someUrl = null;
             // append .json at the end for Rest API Firebase (Get request,only read)
-            string keyNew = "Updater/" + platformToUse + "/";
-            if (!string.IsNullOrEmpty(language))
-            {
-                keyNew += language + "/";
-            }
-            keyNew += bundleName + ".json";
+            string keyNew = platformToUse + "/" + bundleName + ".json";
 
             Log(" Key To Get Link From : " + keyNew);
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                urlToSet.url = test.getEmptyURL;
+                urlToSet.url = string.Empty;
                 return;
             }
 
-            using (var www = UnityEngine.Networking.UnityWebRequest.Get(DatabaseURL + keyNew)) // (baseUrl + keyNew)
+            using (var www = UnityEngine.Networking.UnityWebRequest.Get(DatabaseURL + keyNew))
             {
                 await www.SendWebRequest();
                 bool Errors = www.isNetworkError || www.isHttpError;
-
                 if (!Errors)
                 {
-                    someUrl = (string)www.downloadHandler.text;
+                    string someUrl = www.downloadHandler.text;
                     Log("New Url : " + someUrl);
-                    urlToSet.url = someUrl.Substring(1, someUrl.Length - 2);
+                    // remove "..." from each of the end Replace("\"", "");
+                    urlToSet.url = someUrl.Replace("\"", "");
                 }
                 else
                 {
-                    Log("Error in Downloadin : " + www.error);
+                    Log("Error in Downloading : " + www.error);
                     Log(www.responseCode);
                 }
-
             }
-
         }
 
-
-        /// <summary>
-        /// DO NOT CALL base method!
-        /// </summary>
-        protected virtual string BundleNameToCacheName(string bundleName, System.Object options)
-        {
-            var prefix = "en";
-            if (options != null)
-            {
-                prefix = ((BundleOptions)options).LoadLanguage;
-            }
-            // Example of implementing custom Mapping
-            string pathInStorage = "Bundles%2F" + platformToUse + "%2F" + prefix + "%2F" + bundleName;
-
-            return pathInStorage;
-        }
+        protected abstract string BundleNameToCacheName(string bundleName, System.Object options);
 
         #endregion // Custom Implementation  if needed
     }
 
     #region  Serialization Utilities
 
-    [System.Serializable]
+    [Serializable]
     public class StreamingAssetsItems
     {
         public string bundleName;
-        public string bundlePathAndroid;
-        public string bundlePathIOS;
+        [SerializeField] private string bundlePathAndroid;
+        [SerializeField] private string bundlePathIOS;
+
+        public string Path
+        {
+            get
+            {
+#if UNITY_ANDROID || UNITY_EDITOR
+                return bundlePathAndroid;
+#endif
+
+#if UNITY_IOS && !UNITY_EDITOR
+                return bundlePathIOS;
+#endif
+            }
+        }
     }
     // Template class
-    public class BehaviourScriptableObject : UnityEngine.ScriptableObject
+    public class BundleScriptable : ScriptableObject
     {
 
     }
+
     public enum Strategy
     {
         ALWAYS_UPDATE = 0,

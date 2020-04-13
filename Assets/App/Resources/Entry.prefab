@@ -56,7 +56,7 @@ MonoBehaviour:
     saveTo: app.custom
     saveToAsset: {fileID: 4900000, guid: 0d44184bb166f4247bf4fd94861cc6b7, type: 3}
   webLoader:
-    mainUrl: https://drive.google.com/uc?export=download&id=1aVXbPuWvGZeIksSawfiRTebx50dPSgHL
+    mainUrl: https://master-4cee4.firebaseio.com/
 --- !u!328 &8668589143725506358
 VideoPlayer:
   m_ObjectHideFlags: 0

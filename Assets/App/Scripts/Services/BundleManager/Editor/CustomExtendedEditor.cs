@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace KAUGamesLviv.Services.Bundles
+namespace Services.Bundles
 {
     public struct EditorCustomStyles
     {
@@ -10,17 +10,17 @@ namespace KAUGamesLviv.Services.Bundles
         {
             get
             {
-                if(_header == null)
+                if (_header == null)
                 {
                     _header = new GUIStyle("box")
                     {
-                        
+
                         fontSize = EditorStyles.boldLabel.fontSize,
                         fontStyle = EditorStyles.boldLabel.fontStyle,
                         font = EditorStyles.boldLabel.font,
                         alignment = TextAnchor.UpperLeft,
                         padding = new RectOffset(10, 0, 2, 0),
-                        normal = {background = GUI.skin.GetStyle("ShurikenModuleTitle").normal.background}
+                        normal = { background = GUI.skin.GetStyle("ShurikenModuleTitle").normal.background }
                     };
                 }
                 return _header;

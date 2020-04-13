@@ -64,7 +64,7 @@ namespace Services.Serializer
 
         protected override void SaveT(W data, string from)
         {
-            string dataJson = App.JsonConverter.ToJson(data);
+            string dataJson = App.Services.JsonConverter.ToJson(data);
             PlayerPrefs.SetString(from, dataJson);
             PlayerPrefs.Save();
         }
@@ -77,7 +77,7 @@ namespace Services.Serializer
                 string dataJson = PlayerPrefs.GetString(from);
                 if (!string.IsNullOrEmpty(dataJson))
                 {
-                    data = App.JsonConverter.FromJson<W>(dataJson);
+                    data = App.Services.JsonConverter.FromJson<W>(dataJson);
                 }
 
             }

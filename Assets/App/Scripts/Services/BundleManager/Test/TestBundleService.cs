@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using KAUGamesLviv.Services.Bundles;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine.Networking;
 using System;
+using Services.Bundles;
 
-public class test : MonoBehaviour
+public class TestBundleService : MonoBehaviour
 {
-    [SerializeField] public BundleManagerInstance instanceOfBundles;
-    public static test Instance;
+    public class BundleOptions
+    {
+        public string LoadLanguage = "en";
+        public bool LoadBigdataObject = false;
+    }
+    [SerializeField] public BundleManagerAppExample instanceOfBundles;
+    public static TestBundleService Instance;
 
     public static string getEmptyURL
     {
@@ -153,7 +158,7 @@ public class test : MonoBehaviour
     //     // [MenuItem("Test/testGetMetadata")]
     public static void TestGEtUrl()
     {
-        var instanceMono = FindObjectOfType<test>();
+        var instanceMono = FindObjectOfType<TestBundleService>();
         Instance = instanceMono;
         bytsFull = 0;
         Instance.StartCoroutine(Instance.justGetTheMetadata());
@@ -302,10 +307,10 @@ public class test : MonoBehaviour
 #endif
     public static async void TestGEtFileWithProgress()
     {
-        var instanceMono = FindObjectOfType<test>();
+        var instanceMono = FindObjectOfType<TestBundleService>();
         Instance = instanceMono;
 
-        instanceMono.instanceOfBundles.Constructed();
+        instanceMono.instanceOfBundles.Init();
         string prefix = null;
         BundleOptions myOptions = new BundleOptions();
         string bundleName = instanceMono.bundleName;
@@ -344,7 +349,7 @@ public class test : MonoBehaviour
 #if UNITY_EDITOR
     // ----------------------Testing Ground Firebase Database ---------------------------------------------------------------------------
     #region  Testing Ground Firebase Database
-    [System.Serializable]
+    [Serializable]
     public class DataClass
     {
         public string UserID;
@@ -355,8 +360,8 @@ public class test : MonoBehaviour
 
     public static void TestPushUrl()
     {
-        var instanceMono = FindObjectOfType<test>();
-        instanceMono.instanceOfBundles.Constructed();
+        var instanceMono = FindObjectOfType<TestBundleService>();
+        instanceMono.instanceOfBundles.Init();
         DataClass myNewOne = new DataClass();
         myNewOne.UserID = "TESTID1";
         myNewOne.Points = 100;
@@ -375,8 +380,8 @@ public class test : MonoBehaviour
     /// </summary>
     public static void TestUpdateUrl()
     {
-        var instanceMono = FindObjectOfType<test>();
-        instanceMono.instanceOfBundles.Constructed();
+        var instanceMono = FindObjectOfType<TestBundleService>();
+        instanceMono.instanceOfBundles.Init();
         DataClass myNewOne = new DataClass();
         myNewOne.UserID = "TESTID1";
         myNewOne.Points = 20;
@@ -398,11 +403,11 @@ public class test : MonoBehaviour
             switch (i)
             {
                 case 0:
-                    wholeObject = removedField(wholeObject, i);
+                    wholeObject = RemovedField(wholeObject, i);
                     Debug.Log(wholeObject);
                     break;
                 case 2:
-                    wholeObject = removedField(wholeObject, i);
+                    wholeObject = RemovedField(wholeObject, i);
                     Debug.Log(wholeObject);
 
                     break;
@@ -416,7 +421,7 @@ public class test : MonoBehaviour
     /// <summary>
     /// Functionality for Removing Fields from Json string
     /// </summary>
-    private static string removedField(string originalJson, int fieldToRemove)
+    private static string RemovedField(string originalJson, int fieldToRemove)
     {
         string newS = "";
         string fieldToRemoveString = fieldForData[fieldToRemove];
@@ -438,7 +443,6 @@ public class test : MonoBehaviour
             return newS;
         }
         // find next real property
-        findStartOfField = -1;
         for (int i = fieldToRemove + 1; i < fieldForData.Length; i++)
         {
             findStartOfField = originalJson.IndexOf("\"" + fieldForData[i] + "\"");
@@ -463,7 +467,7 @@ public class test : MonoBehaviour
     /// <summary>
     /// Works without any of the Firebase plugins (Pure Web requests) 
     /// </summary>
-    public IEnumerator PushNewDataViaUrl(test.DataClass dataToPush, string UserId)
+    public IEnumerator PushNewDataViaUrl(TestBundleService.DataClass dataToPush, string UserId)
     {
         // For Firebase
         // append .json at the end for Rest APi Firebase (Get request,only read,
@@ -476,7 +480,7 @@ public class test : MonoBehaviour
         }
         string toString = JsonUtility.ToJson(dataToPush);
 
-        using (var www = UnityWebRequest.Put("https://wrod-57c34.firebaseio.com/" + key + ".json", toString)) // (baseUrl + keyNew + ".json")
+        using (var www = UnityWebRequest.Put("baseUrl" + key + ".json", toString)) // (baseUrl + keyNew + ".json")
         {
             // www.SetRequestHeader("Content-Type", "application/json"); // required if used Post
 
@@ -490,18 +494,16 @@ public class test : MonoBehaviour
             }
             else
             {
-                Debug.Log("Error in Downloadin");
+                Debug.Log("Error in Downloading");
                 Debug.Log(www.error);
                 Debug.Log(www.responseCode);
                 Debug.Log(www.downloadHandler.text);
             }
-
         }
-
     }
 
     /// <summary>
-    /// Update Databse at location! Works without any of the Firebase plugins (Pure Web requests) 
+    /// Update Database at location! Works without any of the Firebase plugins (Pure Web requests) 
     /// </summary>
     public IEnumerator UpdateDataViaUrl(string dataToPush, string UserId)
     {
@@ -515,7 +517,7 @@ public class test : MonoBehaviour
             yield break;
         }
 
-        using (var www = new UnityWebRequest("https://wrod-57c34.firebaseio.com/" + key + ".json", "PATCH")) // (baseUrl + keyNew + ".json")
+        using (var www = new UnityWebRequest("baseUrl" + key + ".json", "PATCH")) // (baseUrl + keyNew + ".json")
         {
             byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(dataToPush);
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
@@ -531,7 +533,7 @@ public class test : MonoBehaviour
             }
             else
             {
-                Debug.Log("Error in Downloadin");
+                Debug.Log("Error in Downloading");
                 Debug.Log(www.error);
                 Debug.Log(www.responseCode);
                 Debug.Log(www.downloadHandler.text);

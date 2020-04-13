@@ -57,7 +57,7 @@ namespace Scripts.Services
                 }
                 else
                 {
-                    return App.JsonConverter.FromJson<T>(req.downloadHandler.text);
+                    return App.Services.JsonConverter.FromJson<T>(req.downloadHandler.text);
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace Scripts.Services
         }
 
         /// <summary>
-        /// Load all games data
+        /// Load all games data. Caches it inside the device cached folder
         /// </summary>
         /// <param name="callback">success callback</param>
         /// <param name="error">error callback</param>

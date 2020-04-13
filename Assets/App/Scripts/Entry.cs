@@ -68,7 +68,7 @@ public class Entry : SingletonSelfCreator<Entry>
         {
             return;
         }
-        App.SceneService.LoadSceneWithVideo(1, null, 2);
+        App.Services.SceneService.LoadSceneWithVideo(1, null, 2);
     }
 
     protected override void OnApplicationQuit()

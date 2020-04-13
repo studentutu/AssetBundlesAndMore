@@ -40,21 +40,22 @@ public class Test : MonoBehaviour
             ThreadTools.StartCoroutine(testImage());
         }
 
-        foreach (var item in modelUrlLists.Urls)
-        {
-            if (!string.IsNullOrEmpty(item.Url))
-            {
-                // parse
-                item.Url = item.Url.Replace("open?id", "uc?export=download&id");
-            }
-        }
+        // Google Drive
+        // foreach (var item in modelUrlLists.Urls)
+        // {
+        //     if (!string.IsNullOrEmpty(item.Url))
+        //     {
+        //         // parse
+        //         item.Url = item.Url.Replace("open?id", "uc?export=download&id");
+        //     }
+        // }
     }
 
     private IEnumerator writToCor()
     {
         yield return null;
-        var asConverterJsonUtility = App.JsonConverter as ConverterJsonUtility;
-        asConverterJsonUtility.WriteToLocalTextAsset(App.JsonConverter.ToJson(modelUrlLists), saveTo);
+        var asConverterJsonUtility = App.Services.JsonConverter as ConverterJsonUtility;
+        asConverterJsonUtility.WriteToLocalTextAsset(App.Services.JsonConverter.ToJson(modelUrlLists), saveTo);
     }
 
     private IEnumerator writeAsBase64()
@@ -62,7 +63,7 @@ public class Test : MonoBehaviour
         yield return null;
         var newString = LoaderTextures.ParseToBase64(convertTo);
 
-        var asConverterJsonUtility = App.JsonConverter as ConverterJsonUtility;
+        var asConverterJsonUtility = App.Services.JsonConverter as ConverterJsonUtility;
         asConverterJsonUtility.WriteToLocalTextAsset(newString, saveToBase64);
         // Debug.LogWarning(newString);
         // App.SceneService.LoadSceneWithVideo(nextScene, null, 2);
@@ -73,7 +74,7 @@ public class Test : MonoBehaviour
     private IEnumerator testImage()
     {
         yield return null;
-        var asConverterJsonUtility = App.JsonConverter as ConverterJsonUtility;
+        var asConverterJsonUtility = App.Services.JsonConverter as ConverterJsonUtility;
         var stringToUse = asConverterJsonUtility.ReadAllFromTExtAsset(saveToBase64);
         var texture = LoaderTextures.ParseToTexture(stringToUse);
         if (imageTOPassIn != null)
@@ -90,11 +91,11 @@ public class Test : MonoBehaviour
             return;
         }
         var DisposableObject = new IDisposableObject();
-        var yieldFor = await App.WebLoader.LoadData(DisposableObject, (msg) =>
+        var yieldFor = await App.Services.WebLoader.LoadData(DisposableObject, (msg) =>
        {
            Debug.LogError(" Error " + msg);
        },
-        "https://drive.google.com/uc?export=download&id=13XUhCO_BR5RA9j7-7zI_8BOEGeyBQvpZ" //+ "/pub?output=txt"
+        App.Services.WebLoader.MainUrl //+ "/pub?output=txt"
         );
         // Debug.LogWarning(yieldFor);
         var texture = LoaderTextures.ParseToTexture(yieldFor);

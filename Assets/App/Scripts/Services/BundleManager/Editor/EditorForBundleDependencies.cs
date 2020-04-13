@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEditorInternal;
 
-namespace KAUGamesLviv.Services.Bundles
+namespace Services.Bundles
 {
 
     [CustomEditor(typeof(BundleDependencies), true)]
@@ -20,13 +20,13 @@ namespace KAUGamesLviv.Services.Bundles
         private int indexFocused = -1;
         private float HeightForActive = 120;
 
-        private Dictionary<string, SerializedProperty> _dictionaryOfproperties;
+        private Dictionary<string, SerializedProperty> _dictionaryProperties;
 
         public void OnEnable()
         {
             _bundleDep = target as BundleDependencies;
             var allProps = new List<string>();
-            _dictionaryOfproperties = null;
+            _dictionaryProperties = null;
             Dictionary<string, SerializedProperty> allProperties = new Dictionary<string, SerializedProperty>();
             var myObj = _bundleDep;
             if (myObj != null)
@@ -41,7 +41,7 @@ namespace KAUGamesLviv.Services.Bundles
                 var something = serializedObject.FindProperty(item);
                 if (!allProperties.ContainsKey(item) && something != null)
                 {
-                    allProperties.Add(item,something );
+                    allProperties.Add(item, something);
                 }
                 if (something != null && item.Contains("bundleDependinciesSerialized"))
                 {
@@ -49,7 +49,7 @@ namespace KAUGamesLviv.Services.Bundles
                 }
 
             }
-            _dictionaryOfproperties = allProperties;
+            _dictionaryProperties = allProperties;
             _listOfDependencies = new ReorderableList(serializedObject, _bundleDependinciesSerialized.FindPropertyRelative("dictionaryitem"), true, true, true, true);
             _listOfDependencies.drawElementCallback = DrawProductsElement;
             _listOfDependencies.drawHeaderCallback = DrawProductsHeader;
@@ -106,7 +106,7 @@ namespace KAUGamesLviv.Services.Bundles
 
         private static void DrawDefaultProps(SerializedProperty serialObjectInner)
         {
-            EditorGUILayout.PropertyField(serialObjectInner,true);
+            EditorGUILayout.PropertyField(serialObjectInner, true);
         }
 
         private void SerializedDictionary()
@@ -124,14 +124,14 @@ namespace KAUGamesLviv.Services.Bundles
 
         private void DisplayOwnMapping()
         {
-            foreach (var item in _dictionaryOfproperties.Keys)
+            foreach (var item in _dictionaryProperties.Keys)
             {
                 switch (item)
                 {
                     case "bundleDependinciesSerialized":
                         break;
                     default:
-                        DrawDefaultProps(_dictionaryOfproperties[item]);
+                        DrawDefaultProps(_dictionaryProperties[item]);
                         break;
                 }
             }
