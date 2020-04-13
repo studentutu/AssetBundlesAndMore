@@ -5,10 +5,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Services.Bundles;
 using System.Threading.Tasks;
+using Scripts;
+using Scripts.Gameplay.Controllers;
 
 // [CreateAssetMenu(fileName = "Container", menuName = "Bundles/Example", order = 0)]
 public class BundleManagerAppExample : BundleService<BundleManagerAppExample>
 {
+    // Public%2FAndroid%2Fnewmarkers?alt=media&
+    [SerializeField] private string CachedNamesRexExp = "Public%2F{0}%2F{1}";
 
     #region Your Custom Implementation of Getting real Url for a given bundlename
     protected override Task GetUrlAsTask(string bundleName, UrlAsStringReference urlToSet, object options)
@@ -22,101 +26,36 @@ public class BundleManagerAppExample : BundleService<BundleManagerAppExample>
     /// </summary>
     private async Task GetUrl(string bundleName, UrlAsStringReference urlToSet, System.Object options)
     {
-        var myOptions = options as TestBundleService.BundleOptions;
-        string language = myOptions.LoadLanguage;
-        // if (PlayerPrefs.HasKey(BundlesManager.LANGUAGE_FROM_BUNDLE))
-        // {
-        //     language = BundlesManager.LANGUAGE_FROM_BUNDLE;
-        // }
-
-        if (myOptions.LoadBigdataObject)
+        var master = App.GetController<DownloadMetaDataFromFirebase>();
+        if (master.actualDataBase == null)
         {
-            // append .json at the end for Rest API Firebase (Get request,only read)
-            string keyNew = platformToUse + ".json";
-
-            Log(" Key To Get Link From : " + keyNew);
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-            {
-                urlToSet.url = TestBundleService.getEmptyURL;
-                return;
-            }
-
-            using (var www = UnityWebRequest.Get(DatabaseURL + keyNew)) // (baseUrl + keyNew)
-            {
-                await www.SendWebRequest();
-                bool Errors = www.isNetworkError || www.isHttpError;
-
-                if (!Errors)
-                {
-                    string someUrl = (string)www.downloadHandler.text;
-                    Log("New Url : " + someUrl);
-                    urlToSet.url = someUrl.Substring(1, someUrl.Length - 2);
-                }
-                else
-                {
-                    Log("Error while Downloading : " + www.error);
-                    Log(www.responseCode);
-                }
-            }
+            await master.GetAllUrls(new IDisposableObject(), master.MainUrl);
         }
-        else
-        {
-
-            // append .json at the end for Rest API Firebase (Get request,only read)
-            string keyNew = "Updater/" + platformToUse + "/";
-            if (!string.IsNullOrEmpty(language))
-            {
-                keyNew += language + "/";
-            }
-            keyNew += bundleName + ".json";
-
-            Log(" Key To Get Link From : " + keyNew);
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-            {
-                urlToSet.url = TestBundleService.getEmptyURL;
-                return;
-            }
-
-            using (var www = UnityWebRequest.Get(DatabaseURL + keyNew)) // (baseUrl + keyNew)
-            {
-                await www.SendWebRequest();
-                bool Errors = www.isNetworkError || www.isHttpError;
-
-                if (!Errors)
-                {
-                    string someUrl = (string)www.downloadHandler.text;
-                    Log("New Url : " + someUrl);
-                    urlToSet.url = someUrl.Substring(1, someUrl.Length - 2);
-                }
-                else
-                {
-                    Log("Error while Downloading : " + www.error);
-                    Log(www.responseCode);
-                }
-            }
-        }
+        CheckIfNull(master, bundleName, urlToSet);
     }
 
+    private void CheckIfNull(DownloadMetaDataFromFirebase handler, string bundleName, UrlAsStringReference urlToSet)
+    {
+        // append .json at the end for Rest API Firebase (Get request,only read)
+        string urlDownload = null;
+        for (int i = 0; i < handler.actualDataBase.Urls.Count; i++)
+        {
+            if (handler.actualDataBase.Urls[i].Name.ToLower().Equals(bundleName))
+            {
+                urlDownload = handler.actualDataBase.Urls[i].Url;
+                break;
+            }
+        }
+        urlToSet.url = urlDownload;
+    }
 
     /// <summary>
     /// DO NOT CALL base method!
     /// </summary>
     protected override string BundleNameToCacheName(string bundleName, System.Object options)
     {
-        var myOptions = options as TestBundleService.BundleOptions;
-        if (myOptions.LoadBigdataObject)
-        {
-            return "LanguageListing%2F" + platformToUse + "%2F" + bundleName;
-        }
         // Example of implementing custom Mapping
-        var prefix = myOptions.LoadLanguage;
-
-        // if (PlayerPrefs.HasKey(BundlesManager.LANGUAGE_FROM_BUNDLE))
-        // {
-        //     prefix = BundlesManager.LANGUAGE_FROM_BUNDLE;
-        // }
-        string pathInStorage = "Bundles%2F" + platformToUse + "%2F" + prefix + "%2F" + bundleName;
-
+        var pathInStorage = string.Format(CachedNamesRexExp, platformToUse, bundleName);
         return pathInStorage;
     }
 

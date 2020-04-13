@@ -5,13 +5,17 @@ using UnityEngine;
 
 namespace Scripts.Gameplay.Controllers
 {
-    public class DownloadMetaDataFromFirebase
+    public class DownloadMetaDataFromFirebase : IController
     {
         private const string AndroidPlatform = "Android";
         private const string IosPlatform = "IOS";
         private const string MainJson = "MainJson";
+        [SerializeField] private string mainUrl = null;
+        [HideInInspector] public MasterSlaveUrl actualDataBase = null;
 
-        public async Task<List<AssetBundle>> GetAllUrls(IDisposableObject disposable, string Url)
+        public string MainUrl => mainUrl;
+
+        public async Task GetAllUrls(IDisposableObject disposable, string Url)
         {
             string platform = null;
 #if UNITY_ANDROID || UNITY_EDITOR
@@ -26,23 +30,14 @@ namespace Scripts.Gameplay.Controllers
 
             if (!IDisposableObject.IsValid(disposable))
             {
-                return null;
+                return;
             }
-            List<AssetBundle> result = new List<AssetBundle>(master.Urls.Count);
-            foreach (var item in master.Urls)
-            {
-                var bundle = await App.Services.WebLoader
-                                        .LoadAndGetAssetBundle(disposable, OnError, item.Url);
-                if (!IDisposableObject.IsValid(disposable))
-                {
-                    return null;
-                }
-                if (bundle != null && bundle.assetbundle != null)
-                {
-                    result.Add(bundle.assetbundle);
-                }
-            }
-            return result;
+            actualDataBase = master;
+        }
+
+        public void Init(IModel model, IView view)
+        {
+
         }
 
         private void OnError(string message)

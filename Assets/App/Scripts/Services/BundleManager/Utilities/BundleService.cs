@@ -4,6 +4,7 @@ using System.Collections;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Scripts.Services;
 
 namespace Services.Bundles
 {
@@ -60,7 +61,7 @@ namespace Services.Bundles
         #region  Public Utility methods
 
         /// <summary> Always initialize! </summary>
-        public void Init()
+        public override void Init()
         {
 #if UNITY_ANDROID
             platformToUse = "Android";
@@ -1274,9 +1275,11 @@ namespace Services.Bundles
         }
     }
     // Template class
-    public class BundleService : ScriptableObject
+    public class BundleService : ScriptableObject, Scripts.Services.IServices
     {
-
+        public virtual void Init()
+        {
+        }
     }
 
     public enum Strategy

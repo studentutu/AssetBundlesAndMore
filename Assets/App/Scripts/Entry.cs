@@ -5,6 +5,7 @@ using Scripts.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Scripts.Gameplay.Controllers;
 
 [ExecutionOrder(-1000)]
 public class Entry : SingletonSelfCreator<Entry>
@@ -18,6 +19,7 @@ public class Entry : SingletonSelfCreator<Entry>
     [SerializeField] private SceneManagementService sceneService = null;
     [SerializeField] private ConverterJsonUtility jsonConverter = null;
     [SerializeField] private URLLoader webLoader = null;
+    [SerializeField] private BundleManagerAppExample bundleService = null;
 
     protected override string PrefabPath => nameof(Entry);
     // protected override bool IsDontDestroy => false;
@@ -54,7 +56,10 @@ public class Entry : SingletonSelfCreator<Entry>
             webLoader,
             new DownloadAssetBundles()
         };
-        List<IController> controllers = new List<IController>();
+        List<IController> controllers = new List<IController>
+        {
+            new DownloadMetaDataFromFirebase()
+        };
 
         App.Start(currentServices, controllers);
 
